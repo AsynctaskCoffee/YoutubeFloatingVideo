@@ -1,11 +1,13 @@
 package com.pipvideo.youtubepipvideoplayer;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,6 +17,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -26,16 +31,15 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView;
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+import static android.view.View.GONE;
 
 public class TaskCoffeeVideo {
     private AppCompatActivity activity;
     private TaskCoffeeVideo coffeeVideo;
     private static TaskCoffeeVideo instance;
-
-
-    public TaskCoffeeVideo() {
-    }
 
     public TaskCoffeeVideo(AppCompatActivity activity) {
         this.activity = activity;
@@ -58,7 +62,6 @@ public class TaskCoffeeVideo {
     }
 
     private float videoStartSecond = 0f;
-    private String youtubeVideoId = "nPLV7lGbmT4";
     private int screenHeight;
     private int screenWidht;
     private PopupWindow popupWindow;
@@ -73,6 +76,12 @@ public class TaskCoffeeVideo {
     private YouTubePlayer youTubePlayer = null;
     private SeekBar seekBar;
     private boolean isSetupNeeded = true;
+    private ImageView ytbPnlExpand;
+    private ImageView ytbPnlClose;
+    private int positionX = 0;
+    private int positionY = 100;
+    private Handler visibleUIHandler;
+    private Runnable visibleUIRunnable;
 
     public enum FLOAT_MOVE {
         STICKY, FREE
@@ -111,6 +120,8 @@ public class TaskCoffeeVideo {
 
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
+
+                    triggerVisibleUIEvent();
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             orgX = (int) event.getX();
@@ -129,18 +140,26 @@ public class TaskCoffeeVideo {
                     return true;
                 }
             });
-            popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    isSetupNeeded = true;
-                }
-            });
             isSetupNeeded = false;
         }
         setPlayerView(youtubeVideoId);
         return coffeeVideo;
     }
 
+    private void triggerVisibleUIEvent(){
+        visibleAndEnableUI();
+        visibleUIHandler.removeCallbacks(null);
+        visibleUIHandler.postDelayed(visibleUIRunnable, 1000);
+    }
+
+    private void visibleAndEnableUI() {
+        ytbPnlClose.setVisibility(View.VISIBLE);
+        ytbPnlExpand.setVisibility(View.VISIBLE);
+        playPauseButton.setVisibility(View.VISIBLE);
+        ytbPnlClose.setEnabled(true);
+        ytbPnlExpand.setEnabled(true);
+        playPauseButton.setEnabled(true);
+    }
 
     private void repositionScript(final PopupWindow popupWindow, final int defX, final int defY) {
         TypedValue tv = new TypedValue();
@@ -155,17 +174,48 @@ public class TaskCoffeeVideo {
         animator.setDuration(mDuration);
         final int endX = (getScreenWidht() - getPopupWidht()) / 2;
         final int endY = (defY < getScreenHeight() / 2) ? (actionBarHeight) : (getScreenHeight() - (actionBarHeight + getPopupHeight()));
+        positionX = endX;
+        positionY = endY;
         animator.addUpdateListener(animation -> popupWindow.update((int) (defX + (endX - defX) * (float) animation.getAnimatedValue()), (int) (defY + (endY - defY) * (float) animation.getAnimatedValue()), -1, -1, true));
         animator.start();
     }
 
+
     public void show(View targetView) {
+        positionX = (getScreenWidht() - getPopupWidht()) / 2;
         popupWindow.showAtLocation(targetView, Gravity.NO_GRAVITY, (getScreenWidht() - getPopupWidht()) / 2, 100);
     }
 
-    private AbstractYouTubePlayerListener playerListener;
 
+    private void expandVideoView(PopupWindow popupWindow, int type) {
+        triggerVisibleUIEvent();
+        ValueAnimator anim = ValueAnimator.ofFloat(0, 1);
+        anim.setDuration(200);
 
+        AtomicInteger latestH = new AtomicInteger();
+        AtomicInteger latestW = new AtomicInteger();
+
+        anim.addUpdateListener(animation -> {
+            if (type == 1) {
+                latestH.set((int) (((getPopupWidht() - (200 * (float) animation.getAnimatedValue())) / 16) * 9));
+                latestW.set((int) (getPopupWidht() - (200 * (float) animation.getAnimatedValue())));
+                popupWindow.update((getScreenWidht() - latestW.intValue()) / 2, positionY, latestW.intValue(), latestH.intValue());
+            } else if (type == 0) {
+                latestH.set((int) (((getPopupWidht() + (200 * (float) animation.getAnimatedValue())) / 16) * 9));
+                latestW.set((int) (getPopupWidht() + (200 * (float) animation.getAnimatedValue())));
+                popupWindow.update((getScreenWidht() - latestW.intValue()) / 2, positionY, latestW.intValue(), latestH.intValue());
+            }
+        });
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                setPopupHeight(latestH.intValue());
+                setPopupWidht(latestW.intValue());
+            }
+        });
+        anim.start();
+    }
 
     public void show(int x, int y, int gravity) {
         popupWindow.showAtLocation(null, gravity, x, y);
@@ -209,7 +259,7 @@ public class TaskCoffeeVideo {
                         switch (state) {
                             case PLAYING:
                                 Log.d(TAG, "video state " + state.name());
-                                progressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(GONE);
                                 playPauseButton.setVisibility(View.VISIBLE);
                                 break;
                             case UNKNOWN:
@@ -217,7 +267,7 @@ public class TaskCoffeeVideo {
                                 break;
                             case BUFFERING:
                                 progressBar.setVisibility(View.VISIBLE);
-                                playPauseButton.setVisibility(View.GONE);
+                                playPauseButton.setVisibility(GONE);
                                 Log.d(TAG, "video state " + state.name());
                                 break;
                             case VIDEO_CUED:
@@ -253,6 +303,8 @@ public class TaskCoffeeVideo {
     }
 
     private void setUpViews(View v) {
+        ytbPnlClose = v.findViewById(R.id.ytb_pnl_close);
+        ytbPnlExpand = v.findViewById(R.id.ytb_pnl_expand);
         playerView = v.findViewById(R.id.youtube_player);
         draggablePanel = v.findViewById(R.id.draggablePanel);
         playPauseButton = v.findViewById(R.id.ytb_play_pause_button);
@@ -262,7 +314,47 @@ public class TaskCoffeeVideo {
     }
 
     private void setupUIListeners() {
+        visibleUIHandler = new Handler();
+        visibleUIRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                if (ytbPnlExpand.getVisibility() == View.VISIBLE) {
+                    Animation fadeOut = new AlphaAnimation(1, 0);
+                    fadeOut.setInterpolator(new AccelerateInterpolator());
+                    fadeOut.setStartOffset(1000);
+                    fadeOut.setDuration(200);
+                    ytbPnlExpand.startAnimation(fadeOut);
+                    ytbPnlClose.startAnimation(fadeOut);
+                    playPauseButton.startAnimation(fadeOut);
+                    fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            ytbPnlClose.setVisibility(View.INVISIBLE);
+                            ytbPnlExpand.setVisibility(View.INVISIBLE);
+                            playPauseButton.setVisibility(View.INVISIBLE);
+                            ytbPnlClose.setEnabled(false);
+                            ytbPnlExpand.setEnabled(false);
+                            playPauseButton.setEnabled(false);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
+
+                }
+            }
+        };
+
         playPauseButton.setOnClickListener(v -> {
+            triggerVisibleUIEvent();
             if (playerView.getTag() != null && playerView.getTag().equals(PlayerConstants.PlayerState.PLAYING.name())) {
                 if (youTubePlayer != null) {
                     youTubePlayer.pause();
@@ -277,22 +369,51 @@ public class TaskCoffeeVideo {
                 }
             }
         });
+
+        popupWindow.setOnDismissListener(() -> {
+            if (visibleUIHandler!=null)
+            visibleUIHandler.removeCallbacks(null);
+            if (youTubePlayer != null)
+                youTubePlayer.pause();
+            isSetupNeeded = true;
+        });
+
+        ytbPnlClose.setOnClickListener(v -> popupWindow.dismiss());
+
+        ytbPnlExpand.setOnClickListener(v -> {
+            if (ytbPnlExpand.getTag().equals("normal")) {
+                (ytbPnlExpand).setImageDrawable(activity.getResources().getDrawable(R.drawable.collapse));
+                expandVideoView(popupWindow, 0);
+                ytbPnlExpand.setTag("max");
+            } else if (v.getTag().equals("max")) {
+                (ytbPnlExpand).setImageDrawable(activity.getResources().getDrawable(R.drawable.maximize));
+                expandVideoView(popupWindow, 1);
+                ytbPnlExpand.setTag("normal");
+            }
+        });
     }
 
-    public int getPopupWidht() {
+
+    private int getPopupWidht() {
         return popupWidht;
     }
 
-    public void setPopupWidht(int popupWidht) {
+    private void setPopupWidht(int popupWidht) {
         this.popupWidht = popupWidht;
+        if (!isSetupNeeded) {
+            popupWindow.setWidth(getPopupWidht());
+        }
     }
 
-    public int getPopupHeight() {
+    private int getPopupHeight() {
         return popupHeight;
     }
 
-    public void setPopupHeight(int popupHeight) {
+    private void setPopupHeight(int popupHeight) {
         this.popupHeight = popupHeight;
+        if (!isSetupNeeded) {
+            popupWindow.setHeight(getPopupHeight());
+        }
     }
 
     private enum SCALE {
@@ -309,11 +430,11 @@ public class TaskCoffeeVideo {
         this.videoScale = videoScale;
     }
 
-    public int getScreenHeight() {
+    private int getScreenHeight() {
         return screenHeight;
     }
 
-    public void setScreenHeight(int screenHeight) {
+    private void setScreenHeight(int screenHeight) {
         this.screenHeight = screenHeight;
     }
 

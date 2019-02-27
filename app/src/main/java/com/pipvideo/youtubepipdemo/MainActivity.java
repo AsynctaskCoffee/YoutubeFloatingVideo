@@ -22,6 +22,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.Abstract
 import com.pierfrancescosoffritti.androidyoutubeplayer.utils.YouTubePlayerTracker;
 import com.pipvideo.youtubepipvideoplayer.FlyingVideo;
 import com.pipvideo.youtubepipvideoplayer.TaskCoffeeVideo;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -189,11 +190,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void fillDummys() {
-        dummyContents.add(new DummyContents("Egemen ÖZOGUL", getString(R.string.content_1), "15:04 Monday", "uR7RNP59lsE", "", ""));
-        dummyContents.add(new DummyContents("Elon Musk", getString(R.string.content_2), "18:00 Wednesday", "sX1Y2JMK6g8", "", ""));
-        dummyContents.add(new DummyContents("Seyda SEVGEN", getString(R.string.content_3), "00:10 Sunday", "94gahPBPIqk", "", ""));
-        dummyContents.add(new DummyContents("Ricardo Quaresma", getString(R.string.content_4), "16:30 Monday", "WgtXl2n9iUc", "", ""));
-        dummyContents.add(new DummyContents("Jerry Jones", getString(R.string.content_6), "09:00 Friday", "zg79C7XM1Xs", "", ""));
         dummyContents.add(new DummyContents("AnnenMayKantereit Official", getString(R.string.content_5), "11:25 Thursday", "tERRFWuYG48", "", ""));
+        dummyContents.add(new DummyContents("Jerry Jones", getString(R.string.content_6), "09:00 Friday", "zg79C7XM1Xs", "", ""));
+        dummyContents.add(new DummyContents("Ricardo Quaresma", getString(R.string.content_4), "16:30 Monday", "WgtXl2n9iUc", "", ""));
+        dummyContents.add(new DummyContents("Elon Musk", getString(R.string.content_2), "18:00 Wednesday", "sX1Y2JMK6g8", "", ""));
+        dummyContents.add(new DummyContents("Egemen ÖZOGUL", getString(R.string.content_1), "15:04 Monday", "uR7RNP59lsE", "", ""));
+        dummyContents.add(new DummyContents("Seyda SEVGEN", getString(R.string.content_3), "00:10 Sunday", "94gahPBPIqk", "", ""));
     }
 }
