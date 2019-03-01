@@ -18,10 +18,13 @@
             android:layout_height="50dp"
             android:padding="5dp">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/dummy_img_user"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/lolpng" />
+                android:src="@drawable/lolpng"
+                app:civ_border_color="#11f1f1f1"
+                app:civ_border_width="4dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -49,10 +52,10 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="15dp"
-                        android:tint="@android:color/white"
                         android:layout_gravity="center_vertical"
                         android:adjustViewBounds="true"
-                        android:src="@drawable/time_icon" />
+                        android:src="@drawable/time_icon"
+                        android:tint="@android:color/white" />
 
                     <TextView
                         android:id="@+id/dummy_txt_date"
@@ -72,19 +75,50 @@
 
         </LinearLayout>
 
-        <com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
-            android:id="@+id/dummy_youtube_view"
+
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+
+
+            <com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
+                android:id="@+id/dummy_youtube_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/start_float_bottom_gravity"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:layout_margin="10dp"
+                android:padding="4dp"
+                android:rotation="-180"
+                android:src="@drawable/floating_icon"
+                android:tint="@android:color/white" />
+
+
+            <ImageView
+                android:id="@+id/start_float_top_gravity"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="start"
+                android:layout_margin="10dp"
+                android:padding="4dp"
+                android:src="@drawable/floating_icon"
+                android:tint="@android:color/white" />
+
+
+        </FrameLayout>
 
 
         <TextView
             android:id="@+id/dummy_txt_content"
             android:layout_width="match_parent"
-            android:textColor="#AAAAAA"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:textSize="18dp" />
+            android:textColor="#EEEEEE"
+            android:textSize="15dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -101,12 +135,12 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:tint="@android:color/white"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:adjustViewBounds="true"
                     android:padding="10dp"
-                    android:src="@drawable/dummy_like_icon" />
+                    android:src="@drawable/dummy_like_icon"
+                    android:tint="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -127,12 +161,12 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:tint="@android:color/white"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:adjustViewBounds="true"
                     android:padding="10dp"
-                    android:src="@drawable/dummy_comment_icon" />
+                    android:src="@drawable/dummy_comment_icon"
+                    android:tint="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"

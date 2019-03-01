@@ -1,68 +1,58 @@
 package com.pipvideo.youtubepipdemo;
 
-import android.annotation.SuppressLint;
-import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.PlayerConstants;
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView;
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.utils.YouTubePlayerTracker;
 import com.pipvideo.youtubepipvideoplayer.FlyingVideo;
 import com.pipvideo.youtubepipvideoplayer.TaskCoffeeVideo;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     LinearLayout videoContainer;
     ArrayList<DummyContents> dummyContents = new ArrayList<>();
-    YouTubePlayerView selectedView = null;
     ScrollView scrollView;
     YouTubePlayerTracker mTracker = null;
-    DummyContents selectedDummyContent = null;
-    @SuppressLint("ClickableViewAccessibility")
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupViews();
-        scrollView.setOnTouchListener((v, event) -> {
-            checkVisible(selectedView);
-            return false;
-        });
+        FlyingVideo.get(MainActivity.this).close();
+
     }
 
-    private void checkVisible(YouTubePlayerView selectedView) {
-        Rect scrollBounds = new Rect();
-        scrollView.getHitRect(scrollBounds);
-        if (selectedView != null)
-            if (selectedView.getLocalVisibleRect(scrollBounds)) {
-                Log.d("visible", "ok");
-            } else {
-                Log.d("visible", "no"+"  videoID: "+selectedDummyContent.getUserName());
-                float videoSecond = mTracker.getCurrentSecond();
 
-                FlyingVideo.get(MainActivity.this)
-                        .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.STICKY)
-                        .setVideoStartSecond(videoSecond)
-                        .coffeeVideoSetup(selectedDummyContent.getVideoId())
-                        .show(selectedView);
+    public void bottomVideoStart(View view, String videoId) {
+        FlyingVideo.get(MainActivity.this)
+                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+                .coffeeVideoSetup(videoId)
+                .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
+                .show(view);
+    }
 
-                ((YouTubePlayer) selectedView.getTag()).pause();
-            }
+    public void topVideoStart(View view, String videoId) {
+        FlyingVideo.get(MainActivity.this)
+                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.STICKY)
+                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+                .coffeeVideoSetup(videoId)
+                .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.TOP)
+                .show(view);
     }
 
 
@@ -74,15 +64,18 @@ public class MainActivity extends AppCompatActivity {
             videoContainer.addView(socialRow(dummyContents.get(i)));
     }
 
-
     public View socialRow(DummyContents dummyContent) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(15, 15, 15, 15);
         View v = LayoutInflater.from(MainActivity.this).inflate(R.layout.dummy_social_view, null);
+        ImageView dummyImgUser = v.findViewById(R.id.dummy_img_user);
+        ImageView startFloatTopGravity = v.findViewById(R.id.start_float_top_gravity);
+        ImageView startFloatBottomGravity = v.findViewById(R.id.start_float_bottom_gravity);
         TextView dummyUserName = v.findViewById(R.id.dummy_txt_username);
         TextView dummyDate = v.findViewById(R.id.dummy_txt_date);
         TextView dummyContentText = v.findViewById(R.id.dummy_txt_content);
         YouTubePlayerView dummyYoutubePlayer = v.findViewById(R.id.dummy_youtube_view);
+        dummyImgUser.setImageResource(dummyContent.getPfImgId());
         dummyContentText.setText(dummyContent.getDescription());
         dummyUserName.setText(dummyContent.getUserName());
         dummyDate.setText(dummyContent.getDate());
@@ -98,30 +91,30 @@ public class MainActivity extends AppCompatActivity {
                         super.onStateChange(state);
                         switch (state) {
                             case PLAYING:
-                                selectedView = null;
-                                selectedDummyContent = null;
+                                FlyingVideo.get(MainActivity.this).close();
                                 mTracker = new YouTubePlayerTracker();
                                 initializedYouTubePlayer.addListener(mTracker);
-                                selectedView = dummyYoutubePlayer;
-                                selectedView.setTag(initializedYouTubePlayer);
-                                selectedDummyContent = dummyContent;
-                                break;
-                            case ENDED:
-                            case PAUSED:
-                                selectedView = null;
                                 break;
                         }
                     }
                 });
             }
         }), true);
+
+        startFloatTopGravity.setOnClickListener(v1 -> {
+            topVideoStart(v1, dummyContent.getVideoId());
+        });
+        startFloatBottomGravity.setOnClickListener(v12 -> {
+            bottomVideoStart(v12, dummyContent.getVideoId());
+        });
+
         v.setLayoutParams(params);
         return v;
     }
 
-
     class DummyContents {
 
+        private int pfImgId;
         private String userName;
         private String description;
         private String date;
@@ -130,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
         private String commentCount;
 
 
-        public DummyContents(String userName, String description, String date, String videoId, String likeCount, String commentCount) {
+        public DummyContents(int pfImgId, String userName, String description, String date, String videoId, String likeCount, String commentCount) {
+            this.pfImgId = pfImgId;
             this.userName = userName;
             this.description = description;
             this.date = date;
@@ -139,6 +133,13 @@ public class MainActivity extends AppCompatActivity {
             this.commentCount = commentCount;
         }
 
+        public int getPfImgId() {
+            return pfImgId;
+        }
+
+        public void setPfImgId(int pfImgId) {
+            this.pfImgId = pfImgId;
+        }
 
         public String getUserName() {
             return userName;
@@ -190,11 +191,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void fillDummys() {
-        dummyContents.add(new DummyContents("AnnenMayKantereit Official", getString(R.string.content_5), "11:25 Thursday", "tERRFWuYG48", "", ""));
-        dummyContents.add(new DummyContents("Jerry Jones", getString(R.string.content_6), "09:00 Friday", "zg79C7XM1Xs", "", ""));
-        dummyContents.add(new DummyContents("Ricardo Quaresma", getString(R.string.content_4), "16:30 Monday", "WgtXl2n9iUc", "", ""));
-        dummyContents.add(new DummyContents("Elon Musk", getString(R.string.content_2), "18:00 Wednesday", "sX1Y2JMK6g8", "", ""));
-        dummyContents.add(new DummyContents("Egemen ÖZOGUL", getString(R.string.content_1), "15:04 Monday", "uR7RNP59lsE", "", ""));
-        dummyContents.add(new DummyContents("Seyda SEVGEN", getString(R.string.content_3), "00:10 Sunday", "94gahPBPIqk", "", ""));
+        dummyContents.add(new DummyContents(R.drawable.annenmay, "AnnenMayKantereit Official", getString(R.string.content_5), "11:25 Thursday", "tERRFWuYG48", "", ""));
+        dummyContents.add(new DummyContents(R.drawable.jarryjones, "Jerry Jones", getString(R.string.content_6), "09:00 Friday", "zg79C7XM1Xs", "", ""));
+        dummyContents.add(new DummyContents(R.drawable.quaresma, "Ricardo Quaresma", getString(R.string.content_4), "16:30 Monday", "WgtXl2n9iUc", "", ""));
+        dummyContents.add(new DummyContents(R.drawable.elonmusk, "Elon Musk", getString(R.string.content_2), "18:00 Wednesday", "sX1Y2JMK6g8", "", ""));
+        dummyContents.add(new DummyContents(R.drawable.lolpng, "Egemen ÖZOGUL", getString(R.string.content_1), "15:04 Monday", "uR7RNP59lsE", "", ""));
+        dummyContents.add(new DummyContents(R.drawable.seydasevgen, "Seyda SEVGEN", getString(R.string.content_3), "00:10 Sunday", "94gahPBPIqk", "", ""));
     }
 }

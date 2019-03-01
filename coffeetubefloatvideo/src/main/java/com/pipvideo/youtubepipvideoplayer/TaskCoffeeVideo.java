@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
 
 public class TaskCoffeeVideo {
     private AppCompatActivity activity;
@@ -45,6 +46,7 @@ public class TaskCoffeeVideo {
         this.activity = activity;
         coffeeVideo = this;
     }
+
 
     public static TaskCoffeeVideo getInstance(AppCompatActivity activity) {
         if (instance == null) {
@@ -59,6 +61,11 @@ public class TaskCoffeeVideo {
             youTubePlayer.seekTo(videoStartSecond);
         }
         return coffeeVideo;
+    }
+
+    public void close() {
+        if (popupWindow != null)
+            popupWindow.dismiss();
     }
 
     private float videoStartSecond = 0f;
@@ -82,9 +89,23 @@ public class TaskCoffeeVideo {
     private int positionY = 100;
     private Handler visibleUIHandler;
     private Runnable visibleUIRunnable;
+    private FLY_GRAVITY FlyGravity;
 
     public enum FLOAT_MOVE {
         STICKY, FREE
+    }
+
+    public enum FLY_GRAVITY {
+        TOP, BOTTOM
+    }
+
+    public FLY_GRAVITY getFlyGravity() {
+        return FlyGravity;
+    }
+
+    public TaskCoffeeVideo setFlyGravity(FLY_GRAVITY flyGravity) {
+        FlyGravity = flyGravity;
+        return coffeeVideo;
     }
 
     public static FLOAT_MOVE FloatMode = FLOAT_MOVE.STICKY;
@@ -102,7 +123,6 @@ public class TaskCoffeeVideo {
     @SuppressLint("ClickableViewAccessibility")
     public TaskCoffeeVideo coffeeVideoSetup(String youtubeVideoId) {
         if (isSetupNeeded) {
-            setVideoScale(SCALE.W16H9);
             Display display = activity.getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
@@ -121,7 +141,6 @@ public class TaskCoffeeVideo {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
 
-                    triggerVisibleUIEvent();
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             orgX = (int) event.getX();
@@ -130,11 +149,17 @@ public class TaskCoffeeVideo {
                         case MotionEvent.ACTION_MOVE:
                             offsetX = (int) event.getRawX() - orgX;
                             offsetY = (int) event.getRawY() - orgY;
-                            popupWindow.update(offsetX, offsetY, -1, -1, true);
+                            if (ytbPnlClose.getVisibility() == INVISIBLE)
+                                triggerVisibleUIEvent();
+                            else
+                                popupWindow.update(offsetX, offsetY, -1, -1, true);
                             break;
                         case MotionEvent.ACTION_UP:
                             if (getFloatMode() == FLOAT_MOVE.STICKY)
-                                repositionScript(popupWindow, offsetX, offsetY);
+                                if (ytbPnlClose.getVisibility() == INVISIBLE)
+                                    triggerVisibleUIEvent();
+                                else
+                                    repositionScript(popupWindow, offsetX, offsetY);
                             break;
                     }
                     return true;
@@ -146,7 +171,7 @@ public class TaskCoffeeVideo {
         return coffeeVideo;
     }
 
-    private void triggerVisibleUIEvent(){
+    private void triggerVisibleUIEvent() {
         visibleAndEnableUI();
         visibleUIHandler.removeCallbacks(null);
         visibleUIHandler.postDelayed(visibleUIRunnable, 1000);
@@ -183,7 +208,10 @@ public class TaskCoffeeVideo {
 
     public void show(View targetView) {
         positionX = (getScreenWidht() - getPopupWidht()) / 2;
-        popupWindow.showAtLocation(targetView, Gravity.NO_GRAVITY, (getScreenWidht() - getPopupWidht()) / 2, 100);
+        if (getFlyGravity() == FLY_GRAVITY.TOP)
+            popupWindow.showAtLocation(targetView, Gravity.NO_GRAVITY, (getScreenWidht() - getPopupWidht()) / 2, 100);
+        else
+            popupWindow.showAtLocation(targetView, Gravity.NO_GRAVITY, (getScreenWidht() - getPopupWidht()) / 2, getScreenHeight() - getPopupHeight() - 100);
     }
 
 
@@ -217,10 +245,6 @@ public class TaskCoffeeVideo {
         anim.start();
     }
 
-    public void show(int x, int y, int gravity) {
-        popupWindow.showAtLocation(null, gravity, x, y);
-    }
-
     private void setPlayerView(String youtubeVideoId) {
         activity.getLifecycle().addObserver(playerView);
         playerView.getPlayerUIController().showUI(false);
@@ -240,14 +264,12 @@ public class TaskCoffeeVideo {
                     @Override
                     public void onCurrentSecond(float second) {
                         super.onCurrentSecond(second);
-//                        Log.d(TAG, "video second " + second);
                         seekBar.setProgress((int) second);
                     }
 
                     @Override
                     public void onVideoDuration(float duration) {
                         super.onVideoDuration(duration);
-//                        Log.d(TAG, "video duration " + duration);
                         seekBar.setProgress(0);
                         seekBar.setMax((int) duration);
                     }
@@ -315,41 +337,38 @@ public class TaskCoffeeVideo {
 
     private void setupUIListeners() {
         visibleUIHandler = new Handler();
-        visibleUIRunnable = new Runnable() {
-            @Override
-            public void run() {
+        visibleUIRunnable = () -> {
 
-                if (ytbPnlExpand.getVisibility() == View.VISIBLE) {
-                    Animation fadeOut = new AlphaAnimation(1, 0);
-                    fadeOut.setInterpolator(new AccelerateInterpolator());
-                    fadeOut.setStartOffset(1000);
-                    fadeOut.setDuration(200);
-                    ytbPnlExpand.startAnimation(fadeOut);
-                    ytbPnlClose.startAnimation(fadeOut);
-                    playPauseButton.startAnimation(fadeOut);
-                    fadeOut.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
+            if (ytbPnlExpand.getVisibility() == View.VISIBLE) {
+                Animation fadeOut = new AlphaAnimation(1, 0);
+                fadeOut.setInterpolator(new AccelerateInterpolator());
+                fadeOut.setStartOffset(1000);
+                fadeOut.setDuration(200);
+                ytbPnlExpand.startAnimation(fadeOut);
+                ytbPnlClose.startAnimation(fadeOut);
+                playPauseButton.startAnimation(fadeOut);
+                fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                        }
+                    }
 
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            ytbPnlClose.setVisibility(View.INVISIBLE);
-                            ytbPnlExpand.setVisibility(View.INVISIBLE);
-                            playPauseButton.setVisibility(View.INVISIBLE);
-                            ytbPnlClose.setEnabled(false);
-                            ytbPnlExpand.setEnabled(false);
-                            playPauseButton.setEnabled(false);
-                        }
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        ytbPnlClose.setVisibility(View.INVISIBLE);
+                        ytbPnlExpand.setVisibility(View.INVISIBLE);
+                        playPauseButton.setVisibility(View.INVISIBLE);
+                        ytbPnlClose.setEnabled(false);
+                        ytbPnlExpand.setEnabled(false);
+                        playPauseButton.setEnabled(false);
+                    }
 
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-                        }
-                    });
+                    }
+                });
 
-                }
             }
         };
 
@@ -371,8 +390,8 @@ public class TaskCoffeeVideo {
         });
 
         popupWindow.setOnDismissListener(() -> {
-            if (visibleUIHandler!=null)
-            visibleUIHandler.removeCallbacks(null);
+            if (visibleUIHandler != null)
+                visibleUIHandler.removeCallbacks(null);
             if (youTubePlayer != null)
                 youTubePlayer.pause();
             isSetupNeeded = true;
@@ -414,20 +433,6 @@ public class TaskCoffeeVideo {
         if (!isSetupNeeded) {
             popupWindow.setHeight(getPopupHeight());
         }
-    }
-
-    private enum SCALE {
-        W4H3, W16H9
-    }
-
-    private SCALE videoScale;
-
-    public SCALE getVideoScale() {
-        return videoScale;
-    }
-
-    public void setVideoScale(SCALE videoScale) {
-        this.videoScale = videoScale;
     }
 
     private int getScreenHeight() {
