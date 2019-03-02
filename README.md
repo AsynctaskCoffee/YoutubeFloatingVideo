@@ -7,8 +7,25 @@ Picture in picture has become popular these days. Unfortunately Android brought 
 
 ## Features and Usage
 
+### Easy implementation 
 
 `view` can be any Button, Imageview or ImageButton which activate the FlyingVideo. `videoId` should have an ID of your YouTube video. For simply:
+
+```java
+  FlyingVideo.get(MainActivity.this)
+                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.STICKY)
+                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+                .coffeeVideoSetup(videoId)
+                .show(view);
+```
+![](previews/untitledx1.gif) ![](previews/untitledx22.gif)
+
+
+### Sticky and Free Mode
+
+#### Sticky FLOAT_MOVE
+
+FlyingVideo automatically snaps up or down according to the position of the screen where you left the panel.
 
 ```java
   FlyingVideo.get(MainActivity.this)
@@ -18,4 +35,19 @@ Picture in picture has become popular these days. Unfortunately Android brought 
                 .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.TOP)
                 .show(view);
 ```
-![](previews/untitledx1.gif) ![](previews/untitledx22.gif)
+
+
+#### Free FLOAT_MOVE
+
+FlyingVideo never sticks on constant position, it stays on the position where you left.
+
+```java
+    FlyingVideo.get(MainActivity.this)
+                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+                .coffeeVideoSetup(videoId)
+                .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
+                .show(view);
+```
+
+![Sticky](previews/untitledsticky.gif) ![Free](previews/untitlednosticky.gif)
