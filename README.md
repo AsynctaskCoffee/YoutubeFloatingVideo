@@ -18,4 +18,4 @@ Picture in picture has become popular these days. Unfortunately Android brought 
                 .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.TOP)
                 .show(view);
 ```
-![](previews/untitledx1.gif)
+![](previews/untitledx1.gif) ![](previews/untitledx22.gif)
