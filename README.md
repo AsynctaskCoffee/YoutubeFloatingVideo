@@ -116,7 +116,7 @@ Before publishing your app to GooglePlay please make sure that you have read You
 
 
 
-##License
+## License
 
 ```
    Copyright 2019 Egemen ÖZOGUL
