@@ -1,4 +1,7 @@
 # Youtube Floating Video - FlyingVideo
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/84183234c74045b8a64bce56e094f269)](https://app.codacy.com/app/AsynctaskCoffee/YoutubeFloatingVideo?utm_source=github.com&utm_medium=referral&utm_content=AsynctaskCoffee/YoutubeFloatingVideo&utm_campaign=Badge_Grade_Dashboard)
+
 > Easy to use floating Youtube Video Library
 > More features will be added in upcoming days
 
