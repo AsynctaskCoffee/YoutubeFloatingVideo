@@ -93,7 +93,7 @@ FlyVideo appears top of the screen when opened.
 
 #### Full Screen Usage
 
-> Users who are already using do not need to make any changes. Users who want to use full screen feature should get YoutubeApi key. Users without YouTube or devices without PlayStore support are directed to webview for full screen mode.
+> Users who are already using do not need to make any changes. Users who want to use full screen feature should get [YoutubeApi key](https://developers.google.com/youtube/v3/getting-started). Users without YouTube or devices without PlayStore support are directed to webview for full screen mode.
 
 ```java
         setFullScreenToggleEnabled(true, "-YOUR-YOUTUBE-API-KEY-")
