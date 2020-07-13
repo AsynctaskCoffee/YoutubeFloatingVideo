@@ -126,7 +126,7 @@ allprojects {
 
 ```
 dependencies {
-	        implementation 'com.github.AsynctaskCoffee:YoutubeFloatingVideo:0.0.4'
+	        implementation 'com.github.AsynctaskCoffee:YoutubeFloatingVideo:0.0.5'
 	}
 ```
 
