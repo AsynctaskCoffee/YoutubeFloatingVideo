@@ -1,6 +1,6 @@
 package com.pipvideo.youtubepipvideoplayer;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class FlyingVideo {
     private static TaskCoffeeVideo taskCoffeeVideo = null;

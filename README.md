@@ -84,6 +84,31 @@ FlyVideo appears top of the screen when opened.
 
 ![BOTTOM](previews/untitledbottom.gif) ![TOP](previews/untitledtop.gif)
 
+
+### Updates
+
+> 13.07.2020 AndroidX Migration
+
+> FullScreen Support Added
+
+#### Full Screen Usage
+
+> Users who are already using do not need to make any changes. Users who want to use full screen feature should get YoutubeApi key. Users without YouTube or devices without PlayStore support are directed to webview for full screen mode.
+
+```java
+        setFullScreenToggleEnabled(true, "-YOUR-YOUTUBE-API-KEY-")
+```
+
+```java
+FlyingVideo.get(MainActivity.this)
+        .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+        .setFullScreenToggleEnabled(true, "-YOUR-YOUTUBE-API-KEY-")
+        .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+        .coffeeVideoSetup(videoId)
+        .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
+        .show(view);
+```
+
 ## Implementation
 
 ###### Add it in your root build.gradle at the end of repositories:
@@ -122,7 +147,7 @@ Before publishing your app to GooglePlay please make sure that you have read You
 ## License
 
 ```
-   Copyright 2019 Egemen ÖZOGUL
+   Copyright 2020 Egemen ÖZOGUL
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

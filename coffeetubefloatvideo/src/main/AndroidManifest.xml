@@ -1,2 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pipvideo.youtubepipvideoplayer" />
+    package="com.pipvideo.youtubepipvideoplayer" >
+
+    <application>
+        <activity android:name=".WebViewActivity" >
+        </activity>
+        <activity android:name=".YoutubePlayerActivity" />
+    </application>
+
+</manifest>

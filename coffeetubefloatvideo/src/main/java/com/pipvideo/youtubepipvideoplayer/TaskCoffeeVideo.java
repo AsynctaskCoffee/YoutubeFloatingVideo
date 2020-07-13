@@ -4,12 +4,15 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -36,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
 public class TaskCoffeeVideo {
     private AppCompatActivity activity;
@@ -83,13 +87,16 @@ public class TaskCoffeeVideo {
     private YouTubePlayer youTubePlayer = null;
     private SeekBar seekBar;
     private boolean isSetupNeeded = true;
+    private boolean fullScreenToggleEnabled = false;
     private ImageView ytbPnlExpand;
     private ImageView ytbPnlClose;
+    private ImageView ytbPnlFull;
     private int positionX = 0;
     private int positionY = 100;
     private Handler visibleUIHandler;
     private Runnable visibleUIRunnable;
     private FLY_GRAVITY FlyGravity;
+    public static String apiKey = "";
 
     public enum FLOAT_MOVE {
         STICKY, FREE
@@ -116,6 +123,12 @@ public class TaskCoffeeVideo {
 
     public TaskCoffeeVideo setFloatMode(FLOAT_MOVE floatMode) {
         FloatMode = floatMode;
+        return coffeeVideo;
+    }
+
+    public TaskCoffeeVideo setFullScreenToggleEnabled(boolean fullScreenToggleEnabled, String apiKey) {
+        coffeeVideo.fullScreenToggleEnabled = fullScreenToggleEnabled;
+        TaskCoffeeVideo.apiKey = apiKey;
         return coffeeVideo;
     }
 
@@ -168,7 +181,17 @@ public class TaskCoffeeVideo {
             isSetupNeeded = false;
         }
         setPlayerView(youtubeVideoId);
+        setFullScreenListener(youtubeVideoId);
         return coffeeVideo;
+    }
+
+    private void setFullScreenListener(String youtubeVideoId) {
+            ytbPnlFull.setOnClickListener(v -> {
+                Intent i = new Intent(activity, YoutubePlayerActivity.class);
+                i.putExtra("videoId", youtubeVideoId);
+                i.putExtra("startSecond", videoStartSecond);
+                activity.startActivity(i);
+            });
     }
 
     private void triggerVisibleUIEvent() {
@@ -178,9 +201,15 @@ public class TaskCoffeeVideo {
     }
 
     private void visibleAndEnableUI() {
-        ytbPnlClose.setVisibility(View.VISIBLE);
-        ytbPnlExpand.setVisibility(View.VISIBLE);
-        playPauseButton.setVisibility(View.VISIBLE);
+        ytbPnlClose.setVisibility(VISIBLE);
+        ytbPnlExpand.setVisibility(VISIBLE);
+
+        if (fullScreenToggleEnabled) {
+            ytbPnlFull.setVisibility(VISIBLE);
+            ytbPnlFull.setEnabled(true);
+        }
+
+        playPauseButton.setVisibility(VISIBLE);
         ytbPnlClose.setEnabled(true);
         ytbPnlExpand.setEnabled(true);
         playPauseButton.setEnabled(true);
@@ -248,7 +277,6 @@ public class TaskCoffeeVideo {
     private void setPlayerView(String youtubeVideoId) {
         activity.getLifecycle().addObserver(playerView);
         playerView.getPlayerUIController().showUI(false);
-
         playerView.initialize(initializedYouTubePlayer -> initializedYouTubePlayer.addListener(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady() {
@@ -282,13 +310,13 @@ public class TaskCoffeeVideo {
                             case PLAYING:
                                 Log.d(TAG, "video state " + state.name());
                                 progressBar.setVisibility(GONE);
-                                playPauseButton.setVisibility(View.VISIBLE);
+                                playPauseButton.setVisibility(VISIBLE);
                                 break;
                             case UNKNOWN:
                                 Log.d(TAG, "video state " + state.name());
                                 break;
                             case BUFFERING:
-                                progressBar.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(VISIBLE);
                                 playPauseButton.setVisibility(GONE);
                                 Log.d(TAG, "video state " + state.name());
                                 break;
@@ -326,12 +354,14 @@ public class TaskCoffeeVideo {
 
     private void setUpViews(View v) {
         ytbPnlClose = v.findViewById(R.id.ytb_pnl_close);
+        ytbPnlFull = v.findViewById(R.id.ytb_pnl_full);
         ytbPnlExpand = v.findViewById(R.id.ytb_pnl_expand);
         playerView = v.findViewById(R.id.youtube_player);
         draggablePanel = v.findViewById(R.id.draggablePanel);
         playPauseButton = v.findViewById(R.id.ytb_play_pause_button);
         progressBar = v.findViewById(R.id.ytb_progressbar);
         seekBar = v.findViewById(R.id.ytb_seek_bar);
+        ytbPnlFull.setVisibility(fullScreenToggleEnabled ? VISIBLE : GONE);
         setupUIListeners();
     }
 
@@ -339,7 +369,7 @@ public class TaskCoffeeVideo {
         visibleUIHandler = new Handler();
         visibleUIRunnable = () -> {
 
-            if (ytbPnlExpand.getVisibility() == View.VISIBLE) {
+            if (ytbPnlExpand.getVisibility() == VISIBLE) {
                 Animation fadeOut = new AlphaAnimation(1, 0);
                 fadeOut.setInterpolator(new AccelerateInterpolator());
                 fadeOut.setStartOffset(1000);
@@ -358,6 +388,12 @@ public class TaskCoffeeVideo {
                         ytbPnlClose.setVisibility(View.INVISIBLE);
                         ytbPnlExpand.setVisibility(View.INVISIBLE);
                         playPauseButton.setVisibility(View.INVISIBLE);
+
+                        if (fullScreenToggleEnabled) {
+                            ytbPnlFull.setVisibility(INVISIBLE);
+                            ytbPnlFull.setEnabled(false);
+                        }
+
                         ytbPnlClose.setEnabled(false);
                         ytbPnlExpand.setEnabled(false);
                         playPauseButton.setEnabled(false);

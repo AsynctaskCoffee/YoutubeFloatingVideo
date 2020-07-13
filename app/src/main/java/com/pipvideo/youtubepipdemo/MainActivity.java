@@ -1,7 +1,8 @@
 package com.pipvideo.youtubepipdemo;
 
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     public void bottomVideoStart(View view, String videoId) {
         FlyingVideo.get(MainActivity.this)
                 .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+                .setFullScreenToggleEnabled(true, "-YOUR-YOUTUBE-API-KEY-")
                 .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
                 .coffeeVideoSetup(videoId)
                 .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
