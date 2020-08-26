@@ -1,12 +1,13 @@
-# Youtube Floating Video - FlyingVideo
+# Youtube Floating Video - FlyingVideo :tv:
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/84183234c74045b8a64bce56e094f269)](https://app.codacy.com/app/AsynctaskCoffee/YoutubeFloatingVideo?utm_source=github.com&utm_medium=referral&utm_content=AsynctaskCoffee/YoutubeFloatingVideo&utm_campaign=Badge_Grade_Dashboard)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/84183234c74045b8a64bce56e094f269)](https://app.codacy.com/app/AsynctaskCoffee/YoutubeFloatingVideo?utm_source=github.com&utm_medium=referral&utm_content=AsynctaskCoffee/YoutubeFloatingVideo&utm_campaign=Badge_Grade_Dashboard) [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0) ![version](https://img.shields.io/badge/version-0.0.5-blue)
 
 > Easy to use floating Youtube Video Library
+
 > More features will be added in upcoming days
 
 ### Why this project exist ?
-Picture in picture has become popular these days. Unfortunately Android brought this support to Android 8.0 (API level 26) and later versions. Pip and floating video supported apps offer users the ability to easily view other features while watching videos (Like reading comments etc). With this library you can play youtube videos in a floating panel. I have just started to develop this library and I am open to all your ideas and opinions.
+Picture in picture has become popular these days. Unfortunately Android brought this support to Android 8.0 (API level 26) and later versions. Pip and floating video supported apps offer users the ability to easily view other features while watching videos (Like reading comments etc). With this library you can play youtube videos in a floating panel.
 
 ## Features and Usage
 
@@ -16,10 +17,10 @@ Picture in picture has become popular these days. Unfortunately Android brought 
 
 ```java
   FlyingVideo.get(MainActivity.this)
-                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.STICKY)
-                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
-                .coffeeVideoSetup(videoId)
-                .show(view);
+             .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.STICKY)
+             .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+             .coffeeVideoSetup(videoId)
+             .show(view);
 ```
 ![](previews/untitledx1.gif) ![](previews/untitledx22.gif)
 
@@ -32,10 +33,10 @@ FlyingVideo automatically snaps up or down according to the position of the scre
 
 ```java
   FlyingVideo.get(MainActivity.this)
-                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.STICKY)
-                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
-                .coffeeVideoSetup(videoId)
-                .show(view);
+             .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.STICKY)
+             .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+             .coffeeVideoSetup(videoId)
+             .show(view);
 ```
 
 
@@ -45,10 +46,10 @@ FlyingVideo never sticks on constant position, it stays on the position where yo
 
 ```java
     FlyingVideo.get(MainActivity.this)
-                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
-                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
-                .coffeeVideoSetup(videoId)
-                .show(view);
+               .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+               .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+               .coffeeVideoSetup(videoId)
+               .show(view);
 ```
 
 ![Sticky](previews/untitledsticky.gif) ![Free](previews/untitlednosticky.gif)
@@ -62,11 +63,11 @@ FlyVideo appears bottom of the screen when opened.
 
 ```java
     FlyingVideo.get(MainActivity.this)
-                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
-                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
-                .coffeeVideoSetup(videoId)
-                .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
-                .show(view);
+               .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+               .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+               .coffeeVideoSetup(videoId)
+               .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
+               .show(view);
 ```
 
 #### TOP FlyGravity
@@ -75,11 +76,11 @@ FlyVideo appears top of the screen when opened.
 
 ```java
     FlyingVideo.get(MainActivity.this)
-                .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
-                .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
-                .coffeeVideoSetup(videoId)
-                .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.TOP)
-                .show(view);
+               .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+               .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+               .coffeeVideoSetup(videoId)
+               .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.TOP)
+               .show(view);
 ```
 
 ![BOTTOM](previews/untitledbottom.gif) ![TOP](previews/untitledtop.gif)
@@ -101,12 +102,12 @@ FlyVideo appears top of the screen when opened.
 
 ```java
 FlyingVideo.get(MainActivity.this)
-        .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
-        .setFullScreenToggleEnabled(true, "-YOUR-YOUTUBE-API-KEY-")
-        .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
-        .coffeeVideoSetup(videoId)
-        .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
-        .show(view);
+           .setFloatMode(TaskCoffeeVideo.FLOAT_MOVE.FREE)
+           .setFullScreenToggleEnabled(true, "-YOUR-YOUTUBE-API-KEY-")
+           .setVideoStartSecond((mTracker == null) ? 0 : mTracker.getCurrentSecond())
+           .coffeeVideoSetup(videoId)
+           .setFlyGravity(TaskCoffeeVideo.FLY_GRAVITY.BOTTOM)
+           .show(view);
 ```
 
 ## Implementation
@@ -115,19 +116,19 @@ FlyingVideo.get(MainActivity.this)
 
 ```
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	    }
+}
 ```
 
 ###### Add the dependency
 
 ```
 dependencies {
-	        implementation 'com.github.AsynctaskCoffee:YoutubeFloatingVideo:0.0.5'
-	}
+	implementation 'com.github.AsynctaskCoffee:YoutubeFloatingVideo:0.0.5'
+}
 ```
 
 ### Used Libraries
